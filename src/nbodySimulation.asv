@@ -15,7 +15,7 @@ n = 20;
 r = 0.3;
 sigma = 0.5*2^(1/6)*r;
 
-A = 3;
+A = 20;
 B = 3;
 
 times = [];
@@ -31,6 +31,7 @@ yVelocities = zeros(n,1);
 %Matrices for animation
 xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
+
 
 g = 9.81;
 m = 0.001;
@@ -130,7 +131,7 @@ for i = 1:n
 end 
 
 for i = 1:timesLength-1
-    %Optional: displ5ay time (requires code modification)
+    %Optional: display time (requires code modification)
     %title("time: " + num2str(times(i)) + "s");
   
     for j = 1:n
