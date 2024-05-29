@@ -8,12 +8,12 @@ deltaT = 1e-4;
 runTime = 10;   
 loopingTime = runTime/deltaT; 
 timesLength = loopingTime/100;
-epsilon = 1;
-n = 20;    
+epsilon = 10;
+n = 200;    
 boxwidth = 12;
 
-radii = 0.15*ones(n,1);5
-% radii(n/2) = 1;
+radii = 0.15*ones(n,1);
+radii(n/2) = 0.5;
 
 A = 1;
 B = 1;
@@ -43,56 +43,54 @@ xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
 
 masses = ones(n,1);
-% masses(n/2) = 1e12;
+masses(n/2) = 1e2;
 masses = masses.^(-1);
 
 % Kick-off simulator
 sigma = radii/(2^(1/6));
 oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
+%% Preallocate matrices
+numSteps = numel(0:100:length(time));
+xPositionMatrix = zeros(numSteps, size(pos, 1));
+yPositionMatrix = zeros(numSteps, size(pos, 1));
 
-%% Simulation
-
+%% Main simulation loop
 for count = 1:loopingTime
-
-    if mod(count,100) == 0
-        xPositionMatrix(count/100,:) = pos(:,1);
-        yPositionMatrix(count/100,:) = pos(:,2);
+    % Store positions every 100 steps
+    if mod(count, 100) == 0
+        xPositionMatrix(count/100, :) = pos(:, 1)';
+        yPositionMatrix(count/100, :) = pos(:, 2)';
     end
+
     %% Dynamics 
+    xvel = vel(:, 1);
+    yvel = vel(:, 2);
+    xpos = pos(:, 1);
+    ypos = pos(:, 2);
     
-    xvel = vel(:,1);
-    yvel = vel(:,2);
-    xpos = pos(:,1);
-    ypos = pos(:,2);
-    xacc = oldAccelerations(:,1);
-    yacc = oldAccelerations(:,2);
+    % Update positions
+    xpos = xpos + xvel * deltaT + 0.5 * oldAccelerations(:, 1) * deltaT^2;
+    ypos = ypos + yvel * deltaT + 0.5 * oldAccelerations(:, 2) * deltaT^2; 
+    pos = [xpos, ypos];
+    newAcceleration = getAcc(pos, masses, sigma, epsilon, A, B);
 
-    % Update position
-    xpos = xpos + xvel*deltaT + 0.5*xacc*deltaT^2;
-    ypos = ypos + yvel*deltaT + 0.5*yacc*deltaT^2; 
-    newAcceleration = getAcc([xpos, ypos], masses, sigma, epsilon, A, B);
-
-    %% Integrate and update positions for each body
-    % Container collision physics               
-
-    % Check if the particle is hitting the X boundaries of the box
+    % Container collision physics
     inboundX = (xpos - radii <= 0) | (xpos + radii >= boxwidth);
-    xvel(inboundX) = -xvel(inboundX);
     inboundY = (ypos - radii <= 0) | (ypos + radii >= boxwidth);
+    xvel(inboundX) = -xvel(inboundX);
     yvel(inboundY) = -yvel(inboundY);
-
-    % Reverse X velocity if hitting X boundaries
-    pos(:,1) = xpos;
-    pos(:,2) = ypos;
-    vel(:,1) = xvel;
-    vel(:,2) = yvel;
     
-    xvel = xvel + 0.5*(newAcceleration(:,1) + oldAccelerations(:,1))*deltaT;
-    yvel = yvel + 0.5*(newAcceleration(:,2) + oldAccelerations(:,2))*deltaT;
-    vel(:,1) = xvel;
-    vel(:,2) = yvel;
+    % Update velocities
+    xvel = xvel + 0.5 * (newAcceleration(:, 1) + oldAccelerations(:, 1)) * deltaT;
+    yvel = yvel + 0.5 * (newAcceleration(:, 2) + oldAccelerations(:, 2)) * deltaT;
+    
+    % Update arrays
+    vel = [xvel, yvel];
+    
+    % Update accelerations
     oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
-    %progress the simulation and recalculate the dynamics for each body
+    
+    % Progress simulation
     time = time + deltaT;
 end
 
@@ -105,7 +103,6 @@ grid on;
 
 particles = gobjects(n);
 particleColourMatrix = zeros(n,3);
-% radii(n/2) = 0.6;
 
 for i = 1:n
     %random colour values of the particles
