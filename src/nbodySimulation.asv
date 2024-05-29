@@ -27,14 +27,15 @@ yPositions = (boxwidth-2)*rand(1,n)+1;
 xPositions(n/2) = boxwidth/2;
 yPositions(n/2) = boxwidth/2;
 
+pos = [xPositions, yPositions];
 
 absv = 12;
 %velocities
 xVelocities = 2*absv*rand(n,1) - absv;
 yVelocities = 2*absv*rand(n,1) - absv;
-
 xVelocities(n/2) = 0;
 yVelocities(n/2) = 0;
+vel = [xVelocities, yVelocities];
 
 cutoffdistance = 5;
 
@@ -44,44 +45,11 @@ yPositionMatrix = zeros(timesLength, n);
 
 masses = ones(n);
 masses(n/2) = 1e12;
+masses = masses.^(-1);
 
-g = 9.81;
-oldAccelerations = zeros(n,2);
-gravity = [0, 0];
-totalForce = [0 0]; %set new total    
 %kick-off simulator
-% xPositions = parallel.pool.Constant(xPositions);
-% yPositions = parallel.pool.Constant(Positions);
-for j = 1:n   
-    sigma = radii(j)/(2^(1/6));
-    %remember to reset total force to zero 
-    totalForce = [0 0]; %set new total    
-    bodyXPos = xPositions(j);
-    bodyYPos = yPositions(j);
-    parfor i = 1:j-1
-        currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
-        if (currentDistance > cutoffdistance) 
-            continue;
-        end
-        %Distance, unit vector, and total force (which is updated
-        %every iteration
-        unitVector = [(xPositions(i)-xPositions(j))/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
-        currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-        totalForce = totalForce + currentForce;  
-    end
-    parfor i = j+1:n
-        currentDistance = hypot(xPositions(i)-xPositions(j), yPositions(i)-bodyXPos);
-        if (currentDistance > cutoffdistance) 
-            continue;
-        end
-        %Distance, unit vector, and total force (which is updated
-        %every iteration
-        unitVector = [(xPositions(i)-xPositions(j))/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
-        currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-        totalForce = totalForce + currentForce;  
-    end   
-    oldAccelerations(j,:) = totalForce/masses(j);
-end
+sigma = radii/(2^(1/6));
+oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
 
 %% Simulation
 
@@ -94,60 +62,39 @@ for count = 1:loopingTime
   
     %% dynamics 
     
-    %Outer loop (loop through each body, calculating dynamics of each body
-    %before progressing the simulation
-    for j = 1:n
-        sigma = radii(j)/(2^(1/6));
-        %update position
-        xPositions(j) = xPositions(j) + xVelocities(j)*deltaT + 0.5*totalForce(1)*deltaT^2;
-        yPositions(j) = yPositions(j) + yVelocities(j)*deltaT + 0.5*totalForce(2)*deltaT^2; 
-        bodyXPos = xPositions(j);
-        bodyYPos = yPositions(j);
-        %remember to reset total force to zero 
-        totalForce = [0 0]; %set new total
-        parfor i = 1:j-1
-            %Distance, unit vector, and total force (which is updated
-            %every iteration
-            currentDistance = hypot(xPositions(i)-bodyXPos,yPositions(i)-yPositions(j));
-            if (currentDistance > cutoffdistance) 
-                continue;
-            end
+    xvel = vel(:,1);
+    yvel = vel(:,2);
+    xpos = pos(:,1);
+    ypos = pos(:,2);
+    xacc = oldAccelerations(:,1);
+    yacc = oldAccelerations(:,2);
 
-            unitVector = [(xPositions(i)-bodyXPos)/currentDistance (yPositions(i)-yPositions(j))/currentDistance];
-            currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-            totalForce = totalForce + currentForce;                
-        end
-        parfor i = j+1:n
-            %Distance, unit vector, and total force (which is updated
-            %every iteration
-            currentDistance = hypot(xPositions(i)-bodyXPos,yPositions(i)-yPositions(j));
-            if (currentDistance > cutoffdistance) 
-                continue;
-            end
+    %update position
+    xpos = xpos + xvel*deltaT + 0.5*xacc*deltaT^2;
+    ypos = ypos + yvel*deltaT + 0.5*yacc*deltaT^2; 
+    newAcceleration = getAcc(pos, masses, sigma, epsilon, A, B);
+    %% integrate and update positions for each body
+    %container collision physics               
 
-            unitVector = [(xPositions(i)-bodyXPos)/currentDistance (yPositions(i)-yPositions(j))/currentDistance];
-            currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-            totalForce = totalForce + currentForce;                
-        end        
-        newAcceleration = totalForce/masses(j);
-        %% integrate and update positions for each body
-        %container collision physics               
-        if bodyXPos-radii(j) <= 0 || bodyXPos + radii(j) >= boxwidth
-            xVelocities(j) = -xVelocities(j);
-        end
-        if yPositions(j)-radii(j) <= 0 || yPositions(j) + radii(j) >= boxwidth
-            yVelocities(j) = -yVelocities(j);
-        else        
-        xVelocities(j) = xVelocities(j) + 0.5*(newAcceleration(1) + oldAccelerations(j,1))*deltaT;
-        yVelocities(j) = yVelocities(j) + 0.5*(newAcceleration(2) + oldAccelerations(j,2))*deltaT;
-        end
-        oldAccelerations(j,:) = totalForce/masses(j);
-    end
+
+
+
+    xvel((xpos-radii <= 0 || xpos + radii >= boxwidth)) = -xvel((xpos-radii <= 0 || xpos + radii >= boxwidth));
+    yvel((ypos-radii <= 0 || ypos + radii >= boxwidth)) = -yvel((ypos-radii <= 0 || ypos + radii >= boxwidth));
+
+    pos(:,1) = xpos;
+    pos(:,2) = ypos;
+    vel(:,1) = xvel;
+    vel(:,2) = yvel;
     
+    xvel = xvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
+    yvel = yvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
+    vel(:,1) = xvel;
+    vel(:,2) = yvel;
+    oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
     %progress the simulation and recalculate the dynamics for each body
     time = time + deltaT;
 end
-
 
 %% animation
 
@@ -177,8 +124,7 @@ for i = 1:timesLength-1
         'facecolor', particleColourMatrix(j,:), 'edgecolor', 'none');
     end
     
-    pause(10^-6);
-
+    pause(1e-6);
 
     for j = 1:n
         %delete old elements before redrawing 

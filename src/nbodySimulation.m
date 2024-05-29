@@ -12,7 +12,6 @@ epsilon = 1;
 n = 50;    
 boxwidth = 12;
 
-
 radii = 0.15*ones(n);
 radii(n/2) = 1;
 
@@ -27,17 +26,15 @@ yPositions = (boxwidth-2)*rand(1,n)+1;
 xPositions(n/2) = boxwidth/2;
 yPositions(n/2) = boxwidth/2;
 
-pos = [xPositions, yPositions];
-
-
+pos = [xPositions', yPositions'];
 
 absv = 12;
 %velocities
 xVelocities = 2*absv*rand(n,1) - absv;
 yVelocities = 2*absv*rand(n,1) - absv;
-
 xVelocities(n/2) = 0;
 yVelocities(n/2) = 0;
+vel = [xVelocities, yVelocities];
 
 cutoffdistance = 5;
 
@@ -45,39 +42,13 @@ cutoffdistance = 5;
 xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
 
-masses = ones(n);
+masses = ones(n,1);
 masses(n/2) = 1e12;
+masses = masses.^(-1);
 
-g = 9.81;
-oldAccelerations = zeros(n,2);
-gravity = [0, 0];
-totalForce = [0 0]; %set new total    
 %kick-off simulator
-% xPositions = parallel.pool.Constant(xPositions);
-% yPositions = parallel.pool.Constant(Positions);S
-for j = 1:n   
-    sigma = radii(j)/(2^(1/6));
-    %remember to reset total force to zero 
-    totalForce = [0 0]; %set new total    
-    bodyXPos = xPositions(j);
-    bodyYPos = yPositions(j);
-%     parfor i = 1:n
-%         if (i == j) 
-%             continue
-%         end
-%         currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
-%         if (currentDistance > cutoffdistance) 
-%             continue;
-%         end
-%         %Distance, unit vector, and total force (which is updated
-%         %every iteration
-%         unitVector = [(xPositions(i)-bodyXPos)/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
-%         currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-%         totalForce = totalForce + currentForce;  
-%     end
-    
-    oldAccelerations = getAcc(pos, );
-end
+sigma = radii/(2^(1/6));
+oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
 
 %% Simulation
 
@@ -87,54 +58,52 @@ for count = 1:loopingTime
         xPositionMatrix(count/100,:) = xPositions;
         yPositionMatrix(count/100,:) = yPositions;
     end
-  
     %% dynamics 
     
-    %Outer loop (loop through each body, calculating dynamics of each body
-    %before progressing the simulation
-    for j = 1:n
-        sigma = radii(j)/(2^(1/6));
-        %update position
-        xPositions(j) = xPositions(j) + xVelocities(j)*deltaT + 0.5*totalForce(1)*deltaT^2;
-        yPositions(j) = yPositions(j) + yVelocities(j)*deltaT + 0.5*totalForce(2)*deltaT^2; 
-        bodyXPos = xPositions(j);
-        bodyYPos = yPositions(j);
-        %remember to reset total force to zero 
-        totalForce = [0 0]; %set new total
-        parfor i = 1:n
-            if (i == j) 
-                continue
-            end
-           
-            currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
-            if (currentDistance > cutoffdistance) 
-                continue;
-            end
-            %Distance, unit vector, and total force (which is updated
-            %every iteration
-            unitVector = [(xPositions(i)-bodyXPos)/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
-            currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-            totalForce = totalForce + currentForce;  
-        end
-        newAcceleration = totalForce/masses(j);
-        %% integrate and update positions for each body
-        %container collision physics               
-        if bodyXPos-radii(j) <= 0 || bodyXPos + radii(j) >= boxwidth
-            xVelocities(j) = -xVelocities(j);
-        end
-        if bodyYPos-radii(j) <= 0 || bodyYPos + radii(j) >= boxwidth
-            yVelocities(j) = -yVelocities(j);
-        else        
-        xVelocities(j) = xVelocities(j) + 0.5*(newAcceleration(1) + oldAccelerations(j,1))*deltaT;
-        yVelocities(j) = yVelocities(j) + 0.5*(newAcceleration(2) + oldAccelerations(j,2))*deltaT;
-        end
-        oldAccelerations(j,:) = totalForce/masses(j);
+    xvel = vel(:,1);
+    yvel = vel(:,2);
+    xpos = pos(:,1);
+    ypos = pos(:,2);
+    xacc = oldAccelerations(:,1);
+    yacc = oldAccelerations(:,2);
+
+    %update position
+    xpos = xpos + xvel*deltaT + 0.5*xacc*deltaT^2;
+    ypos = ypos + yvel*deltaT + 0.5*yacc*deltaT^2; 
+    newAcceleration = getAcc(pos, masses, sigma, epsilon, A, B);
+    %% integrate and update positions for each body
+    %container collision physics               
+
+    
+    % Check if the particle is hitting the X boundaries of the box
+    inboundX = (xpos - radii' <= 0) | (xpos + radii' >= boxwidth);
+    
+    % Check if the particle is hitting the Y boundaries of the box
+    inboundY = (ypos - radii' <= 0) | (ypos + radii' >= boxwidth);
+    
+    % Reverse X velocity if hitting X boundaries
+    if inboundX
+        xvel = -xvel;
     end
     
+    % Reverse Y velocity if hitting Y boundaries
+    if inboundY
+        yvel = -yvel;
+    end
+
+    pos(:,1) = xpos;
+    pos(:,2) = ypos;
+    vel(:,1) = xvel;
+    vel(:,2) = yvel;
+    
+    xvel = xvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
+    yvel = yvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
+    vel(:,1) = xvel;
+    vel(:,2) = yvel;
+    oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
     %progress the simulation and recalculate the dynamics for each body
     time = time + deltaT;
 end
-
 
 %% animation
 
