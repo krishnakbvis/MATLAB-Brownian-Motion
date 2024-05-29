@@ -12,15 +12,15 @@ epsilon = 1;
 n = 20;    
 boxwidth = 12;
 
-radii = 0.15*ones(n);
-radii(n/2) = 1;
+radii = 0.15*ones(n,1);5
+% radii(n/2) = 1;
 
 A = 1;
 B = 1;
 
 times = [];
 
-%position data of bodies
+% Position data of bodies
 xPositions = (boxwidth-2)*rand(1,n)+1;
 yPositions = (boxwidth-2)*rand(1,n)+1;
 xPositions(n/2) = boxwidth/2;
@@ -29,7 +29,7 @@ yPositions(n/2) = boxwidth/2;
 pos = [xPositions', yPositions'];
 
 absv = 12;
-%velocities
+% Velocities
 xVelocities = 2*absv*rand(n,1) - absv;
 yVelocities = 2*absv*rand(n,1) - absv;
 xVelocities(n/2) = 0;
@@ -38,15 +38,15 @@ vel = [xVelocities, yVelocities];
 
 cutoffdistance = 5;
 
-%Matrices for animation
+% Matrices for animation
 xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
 
 masses = ones(n,1);
-masses(n/2) = 1e12;
+% masses(n/2) = 1e12;
 masses = masses.^(-1);
 
-%kick-off simulator
+% Kick-off simulator
 sigma = radii/(2^(1/6));
 oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
 
@@ -58,7 +58,7 @@ for count = 1:loopingTime
         xPositionMatrix(count/100,:) = pos(:,1);
         yPositionMatrix(count/100,:) = pos(:,2);
     end
-    %% dynamics 
+    %% Dynamics 
     
     xvel = vel(:,1);
     yvel = vel(:,2);
@@ -67,30 +67,21 @@ for count = 1:loopingTime
     xacc = oldAccelerations(:,1);
     yacc = oldAccelerations(:,2);
 
-    %update position
+    % Update position
     xpos = xpos + xvel*deltaT + 0.5*xacc*deltaT^2;
     ypos = ypos + yvel*deltaT + 0.5*yacc*deltaT^2; 
-    newAcceleration = getAcc(pos, masses, sigma, epsilon, A, B);
-    %% integrate and update positions for each body
-    %container collision physics               
+    newAcceleration = getAcc([xpos, ypos], masses, sigma, epsilon, A, B);
 
-    
+    %% Integrate and update positions for each body
+    % Container collision physics               
+
     % Check if the particle is hitting the X boundaries of the box
-    inboundX = (xpos - radii' <= 0) | (xpos + radii' >= boxwidth);
-    
-    % Check if the particle is hitting the Y boundaries of the box
-    inboundY = (ypos - radii' <= 0) | (ypos + radii' >= boxwidth);
-    
-    % Reverse X velocity if hitting X boundaries
-    if inboundX
-        xvel = -xvel;
-    end
-    
-    % Reverse Y velocity if hitting Y boundaries
-    if inboundY
-        yvel = -yvel;
-    end
+    inboundX = (xpos - radii <= 0) | (xpos + radii >= boxwidth);
+    xvel(inboundX) = -xvel(inboundX);
+    inboundY = (ypos - radii <= 0) | (ypos + radii >= boxwidth);
+    yvel(inboundY) = -yvel(inboundY);
 
+    % Reverse X velocity if hitting X boundaries
     pos(:,1) = xpos;
     pos(:,2) = ypos;
     vel(:,1) = xvel;
@@ -114,7 +105,7 @@ grid on;
 
 particles = gobjects(n);
 particleColourMatrix = zeros(n,3);
-radii(n/2) = 0.6;
+% radii(n/2) = 0.6;
 
 for i = 1:n
     %random colour values of the particles
