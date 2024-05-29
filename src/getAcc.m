@@ -30,6 +30,7 @@ function [acceleration] = getAcc(pos, masses, sigmas, epsilon, A, B)
 
     % Forces computation (avoid NaN/Inf propagation)
     forces = 4 * epsilon * ((A * sigmas.^6) .* inv_r7 - (B * sigmas.^12) .* inv_r13);
+    forces(sep < 5) = 0.7*forces(sep < 5);
     % replace entries along diag with zero
     unitX(index) = 0;
     unitY(index) = 0;
