@@ -27,9 +27,6 @@ yPositions = (boxwidth-2)*rand(1,n)+1;
 xPositions(n/2) = boxwidth/2;
 yPositions(n/2) = boxwidth/2;
 
-pos = [xPositions, yPositions];
-
-
 
 absv = 12;
 %velocities
@@ -54,29 +51,36 @@ gravity = [0, 0];
 totalForce = [0 0]; %set new total    
 %kick-off simulator
 % xPositions = parallel.pool.Constant(xPositions);
-% yPositions = parallel.pool.Constant(Positions);S
+% yPositions = parallel.pool.Constant(Positions);
 for j = 1:n   
     sigma = radii(j)/(2^(1/6));
     %remember to reset total force to zero 
     totalForce = [0 0]; %set new total    
     bodyXPos = xPositions(j);
     bodyYPos = yPositions(j);
-%     parfor i = 1:n
-%         if (i == j) 
-%             continue
-%         end
-%         currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
-%         if (currentDistance > cutoffdistance) 
-%             continue;
-%         end
-%         %Distance, unit vector, and total force (which is updated
-%         %every iteration
-%         unitVector = [(xPositions(i)-bodyXPos)/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
-%         currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-%         totalForce = totalForce + currentForce;  
-%     end
-    
-    oldAccelerations = getAcc(pos, );
+    parfor i = 1:j-1
+        currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
+        if (currentDistance > cutoffdistance) 
+            continue;
+        end
+        %Distance, unit vector, and total force (which is updated
+        %every iteration
+        unitVector = [(xPositions(i)-xPositions(j))/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
+        currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
+        totalForce = totalForce + currentForce;  
+    end
+    parfor i = j+1:n
+        currentDistance = hypot(xPositions(i)-xPositions(j), yPositions(i)-bodyXPos);
+        if (currentDistance > cutoffdistance) 
+            continue;
+        end
+        %Distance, unit vector, and total force (which is updated
+        %every iteration
+        unitVector = [(xPositions(i)-xPositions(j))/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
+        currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
+        totalForce = totalForce + currentForce;  
+    end   
+    oldAccelerations(j,:) = totalForce/masses(j);
 end
 
 %% Simulation
@@ -101,28 +105,37 @@ for count = 1:loopingTime
         bodyYPos = yPositions(j);
         %remember to reset total force to zero 
         totalForce = [0 0]; %set new total
-        parfor i = 1:n
-            if (i == j) 
-                continue
-            end
-           
-            currentDistance = hypot(xPositions(i)-bodyXPos, yPositions(i)-bodyYPos);
+        parfor i = 1:j-1
+            %Distance, unit vector, and total force (which is updated
+            %every iteration
+            currentDistance = hypot(xPositions(i)-bodyXPos,yPositions(i)-yPositions(j));
             if (currentDistance > cutoffdistance) 
                 continue;
             end
+
+            unitVector = [(xPositions(i)-bodyXPos)/currentDistance (yPositions(i)-yPositions(j))/currentDistance];
+            currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
+            totalForce = totalForce + currentForce;                
+        end
+        parfor i = j+1:n
             %Distance, unit vector, and total force (which is updated
             %every iteration
-            unitVector = [(xPositions(i)-bodyXPos)/currentDistance, (yPositions(i)-bodyXPos)/currentDistance];
+            currentDistance = hypot(xPositions(i)-bodyXPos,yPositions(i)-yPositions(j));
+            if (currentDistance > cutoffdistance) 
+                continue;
+            end
+
+            unitVector = [(xPositions(i)-bodyXPos)/currentDistance (yPositions(i)-yPositions(j))/currentDistance];
             currentForce = unitVector*4*epsilon*((A*sigma^6/(currentDistance^7)) - (B*sigma^12/currentDistance^13));
-            totalForce = totalForce + currentForce;  
-        end
+            totalForce = totalForce + currentForce;                
+        end        
         newAcceleration = totalForce/masses(j);
         %% integrate and update positions for each body
         %container collision physics               
         if bodyXPos-radii(j) <= 0 || bodyXPos + radii(j) >= boxwidth
             xVelocities(j) = -xVelocities(j);
         end
-        if bodyYPos-radii(j) <= 0 || bodyYPos + radii(j) >= boxwidth
+        if yPositions(j)-radii(j) <= 0 || yPositions(j) + radii(j) >= boxwidth
             yVelocities(j) = -yVelocities(j);
         else        
         xVelocities(j) = xVelocities(j) + 0.5*(newAcceleration(1) + oldAccelerations(j,1))*deltaT;
@@ -164,7 +177,8 @@ for i = 1:timesLength-1
         'facecolor', particleColourMatrix(j,:), 'edgecolor', 'none');
     end
     
-    pause(1e-6);
+    pause(10^-6);
+
 
     for j = 1:n
         %delete old elements before redrawing 
