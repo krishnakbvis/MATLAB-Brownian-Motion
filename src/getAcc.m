@@ -20,9 +20,13 @@ inv_r13 = sep.^(-13);
 inv_r7(inv_r7 == Inf) = 0;
 inv_r13(inv_r13 == Inf) = 0;
 
-
 unitX = dx./sep;
 unitY = dy./sep;
+
+unitX(isnan(unitX)) = 0;
+unitY(isnan(unitY)) = 0;
+
+
 forces = 4*epsilon*((A*sigmas.^6).*inv_r7 - (B*sigmas.^12).*inv_r13);
 ax = (unitX .* forces) * invmasses;
 ay = (unitY .* forces) * invmasses;

@@ -9,7 +9,7 @@ runTime = 10;
 loopingTime = runTime/deltaT; 
 timesLength = loopingTime/100;
 epsilon = 1;
-n = 50;    
+n = 20;    
 boxwidth = 12;
 
 radii = 0.15*ones(n);
@@ -55,8 +55,8 @@ oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
 for count = 1:loopingTime
 
     if mod(count,100) == 0
-        xPositionMatrix(count/100,:) = xPositions;
-        yPositionMatrix(count/100,:) = yPositions;
+        xPositionMatrix(count/100,:) = pos(:,1);
+        yPositionMatrix(count/100,:) = pos(:,2);
     end
     %% dynamics 
     
@@ -96,8 +96,8 @@ for count = 1:loopingTime
     vel(:,1) = xvel;
     vel(:,2) = yvel;
     
-    xvel = xvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
-    yvel = yvel + 0.5*(newAcceleration + oldAccelerations)*deltaT;
+    xvel = xvel + 0.5*(newAcceleration(:,1) + oldAccelerations(:,1))*deltaT;
+    yvel = yvel + 0.5*(newAcceleration(:,2) + oldAccelerations(:,2))*deltaT;
     vel(:,1) = xvel;
     vel(:,2) = yvel;
     oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
