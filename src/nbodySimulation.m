@@ -8,8 +8,8 @@ deltaT = 1e-4;
 runTime = 10;   
 loopingTime = runTime/deltaT; 
 timesLength = loopingTime/100;
-epsilon = 10;
-n = 200;    
+epsilon = 1;
+n = 50;    
 boxwidth = 12;
 
 radii = 0.15*ones(n,1);
@@ -43,9 +43,7 @@ xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
 
 masses = ones(n,1);
-masses(n/2) = 1e2;
-masses = masses.^(-1);
-
+masses(n/2) = 1e5;
 % Kick-off simulator
 sigma = radii/(2^(1/6));
 oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);

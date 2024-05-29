@@ -1,6 +1,6 @@
-function [acceleration] = getAcc(pos, invmasses, sigmas, epsilon, A, B)
+function [acceleration] = getAcc(pos, masses, sigmas, epsilon, A, B)
     % pos is an N x 2 matrix of positions
-    % invmasses is an N x 1 vector of inverse masses
+    % masses is an N x 1 vector of inverse masses
     % sigmas is assumed to be an N x 1 vector
     % epsilon, A, and B are scalars
     % Extract positions
@@ -33,10 +33,13 @@ function [acceleration] = getAcc(pos, invmasses, sigmas, epsilon, A, B)
     % replace entries along diag with zero
     unitX(index) = 0;
     unitY(index) = 0;
-
+    Fx = (unitX .* forces);
+    Fy = (unitY .* forces);
+    FtotX = sum(Fx, 2);
+    FtotY = sum(Fy, 2);
     % Accelerations
-    ax = (unitX .* forces) * invmasses;
-    ay = (unitY .* forces) * invmasses;
+    ax = FtotX ./ masses;
+    ay = FtotY ./ masses;
 
     % Pack together the acceleration components
     acceleration = [ax, ay];
