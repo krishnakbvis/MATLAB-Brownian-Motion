@@ -8,8 +8,8 @@ deltaT = 1e-4;
 runTime = 10;   
 loopingTime = runTime/deltaT; 
 timesLength = loopingTime/100;
-epsilon = 0.1;
-n = 100;    
+epsilon = 1;
+n = 20;    
 boxwidth = 12;
 
 radii = 0.15*ones(n,1);
@@ -43,7 +43,8 @@ xPositionMatrix = zeros(timesLength, n);
 yPositionMatrix = zeros(timesLength, n);
 
 masses = ones(n,1);
-masses(n/2) = 1e3;
+masses(n/2) = 1e5;
+masses = masses.^(-1);
 % Kick-off simulator
 sigma = radii/(2^(1/6));
 oldAccelerations = getAcc(pos, masses, sigma, epsilon, A, B);
@@ -107,39 +108,53 @@ particleColourMatrix = zeros(n,3);
 %     %random colour values of the particles
 %     particleColourMatrix(i,:) = round(rand(1,3),1);
 % end 
+for i = 1:timesLength - 1
+    hold on
+    plot((:,1),pos(:,2),'b.','markersize',14);
+    hold off
+    axis square
+    axis([-2 2 -2 2])
+    
+    subplot(3,1,3)
+    plot(t_all,KE_save,'r.')
+    hold on
+    plot(t_all,PE_save,'b.')
+    plot(t_all,KE_save+PE_save,'k.')
+    hold off
+    axis([0 tEnd -300 300])
+end
+
+
 
 
 for i = 1:timesLength-1
     %Optional: displ5ay time (requires code modification)
     %title("time: " + num2str(times(i)) + "s");
-    axis([0 boxwidth 0 boxwidth]);
-    %use rectangle() to draw a filled circle
-    plot(xPositionMatrix(i,1:n/2-1), yPositionMatrix(i,1:n/2-1), '.', 'MarkerSize',30); 
-    hold on
-    plot(xPositionMatrix(i,n/2), yPositionMatrix(i,n/2), '.', 'MarkerSize', 90); 
-    hold on
-    plot(xPositionMatrix(i,n/2 + 1:n), yPositionMatrix(i,n/2 + 1:n), '.', 'MarkerSize',30); 
-    hold off
-    axis square
-    axis([0 boxwidth 0 boxwidth])
+  
+    for j = 1:n
+        r = radii(j);
+        %use rectangle() to draw a filled circle
+        particles(j) = plot(xPositionMatrix(i,:), yPo, 'o', 'MarkerSize',8) 
+    end
+    
     pause(1e-4);
 
-%     for j = 1:n
-%         %delete old elements before redrawing 
-%         delete(particles(j));
-%     end
-%     
-%     
-% %     reset the array to zero before refilling the array
-%      particles = gobjects(n);
+    for j = 1:n
+        %delete old elements before redrawing 
+        delete(particles(j));
+    end
+    
+    
+%     reset the array to zero before refilling the array
+     particles = gobjects(n);
 end
-% 
-% for j = 1:n
-%     r = radii(j);
-%     particles(j) = rectangle('Curvature', [1 1], ...
-%     'Position', [xPositionMatrix(i,j)-r yPositionMatrix(i,j)-r 2*r 2*r], ...
-%     'facecolor', particleColourMatrix(j,:), 'edgecolor', 'none');
-% end
+
+for j = 1:n
+    r = radii(j);
+    particles(j) = rectangle('Curvature', [1 1], ...
+    'Position', [xPositionMatrix(i,j)-r yPositionMatrix(i,j)-r 2*r 2*r], ...
+    'facecolor', particleColourMatrix(j,:), 'edgecolor', 'none');
+end
 
 
 
