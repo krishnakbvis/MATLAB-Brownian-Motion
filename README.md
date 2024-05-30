@@ -34,15 +34,22 @@ To find the total forces on each particle, we sum each row. Then, to compute acc
 
 ### animation.m
 
+To render fast animations, the 2D MATLAB `plot` function is used. The particle undergoing Brownian motion has a higher marker size. Since `plot` is vectorised, we can almost instantly display all bodies before moving to the next timestep. Between each frame, we need a slight delay, so a for loop is still required. However, the vectorisation of `plot` makes animation very fast, which scales well with a higher molecule count. 
+
 
 ### nbodysimulation.m
 
+`nbodysimulation` uses `computeAcceleration` to get the accelerations of the bodies. Then, it numerically integrates these accelerations using a vectorised Stormer-Verlet method. Additionally, this code contains some key collision physics, which reverses velocities accordingly if masses collide with the container walls. 
+
 ### main.m
 
+`main` executes `nbodysimulation` to produce the positions, and feeds it to `animate` which then animates these positions. 
 
-
-## License
-For open source projects, say how it is licensed.
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+80% complete. Existing tasks:
+
+- Track Brownian motion
+- Increase particle size to 250
+- decrease timestep by a factor of 10
+- create a histogram from the brownian particle's position dataset 
