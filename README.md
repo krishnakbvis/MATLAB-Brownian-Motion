@@ -7,9 +7,9 @@ This project includes a fully vectorised implementation of a molecular dynamics 
 
 `computeAcceleration` is implemented in a fully vectorised way, avoiding the typical nested for-loops seen in naive MD simulations. `nbodysimulation` then uses computeAcceleration to compute the accelerations of the particles and numerically integrate for each timestep. It then returns the position matrices for animation. Then, when called with the correct parameters, animation.m draws the computed positions from `nbodysimulation` and animates them. 
 
-<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/8698cfb0-683c-4cc2-b77b-784eb27b420d" align="left" height="500" width="500">
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/8698cfb0-683c-4cc2-b77b-784eb27b420d" align="left" height="350" width="350">
 
-<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/blob/master/Brownian%20motion%20eg%202.png?raw=true" align="left" height="500" width="500">
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/blob/master/Brownian%20motion%20eg%202.png?raw=true" align="left" height="350" width="350">
 
 
 ### computeAcceleration.m
