@@ -20,6 +20,17 @@ $$\bold{F} = -\nabla V$$
 
 $$\bold{F} = 4{\epsilon}\cdot\left(\dfrac{6B{\sigma}^6}{r^7}-\dfrac{12A{\sigma}^{12}}{r^{13}}\right)$$
 
+To compute this interaction force between each body, consider the n-by-n matrices containing the x and y separations between each body. In computeforces, this is `dx` and `dy`. Instead of using a for-loop to iterate through each body, which is of `O(n^2)` complexity, we can simply calculate `dx = x' - x`, where `x` is an n-by-1 matrix, and `x'` is its transpose. MATLAB uses matrix broadcasting to extend `x'` and `x`, so the result will be an n-by-n matrix of separations. 
+
+Using `dx` and `dy`, we can calculate the x and y components of the unit vectors between particles, the inverse $r^7$ and $r^13$ values in the Lennard-Jones force, and the separation `sep`. We can then calculate the x and y components of forces by multiplying by unit vectors. Let `F` be the n-by-n matrix of forces between particles, and `unitX` and `unitY` by the unit vector component matrices. Then,
+
+```
+    Fx = (unitX .* forces);
+    Fy = (unitY .* forces);
+```
+To find the total forces on each particle, we sum each row. Then, to compute accelerations, we divide element-wise by their masses.
+
+
 
 ### animation.m
 
