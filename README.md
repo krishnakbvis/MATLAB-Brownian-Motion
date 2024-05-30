@@ -28,7 +28,7 @@ Using `dx` and `dy`, we can calculate the x and y components of the unit vectors
     Fx = (unitX .* forces);
     Fy = (unitY .* forces);
 ```
-To find the total forces on each particle, we sum each row. Then, to compute accelerations, we divide element-wise by their masses.
+To find the total forces on each particle, we sum each row. Then, to compute accelerations, we divide element-wise by their masses. This vectorised approach solves force computation in far less than `O(n)` time, and makes our simulation far less than `O(n^2)` time-complex.
 
 
 
