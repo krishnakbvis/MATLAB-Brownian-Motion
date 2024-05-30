@@ -1,8 +1,8 @@
 % timeStep = 1e-4;
 % runTime = 30;   
 % epsilon = 0.1;
-% N = 260;    
-% boxwidth = 17;
+% N = 340;    
+% boxwidth = 24;
 % particleSize = 1;
 % A = 0.2;
 % B = 1;
@@ -16,13 +16,5 @@
 % animate(boxwidth, xPositionMatrix, yPositionMatrix, timesLength, N);
 % filename = "simdata.mat";
 % save(filename);
-createHistogram(xPositionMatrix(:,N/2), yPositionMatrix(:,N/2), 15);
+createHistogram(xPositionMatrix(:,N/2), yPositionMatrix(:,N/2), 18);
 hold off
-
-
-
-
-
-
-
-
