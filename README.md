@@ -16,7 +16,7 @@ $$V_{LJ}(r) = 4\epsilon \left[\left( A\frac{\sigma}{r}\right)^{12} -  B\left(\fr
 
 We can compute forces using the Newtonian relation 
 
-$$\bold{F} = \grad V$$
+$$\bold{F} = \nabla V$$
 
 
 
