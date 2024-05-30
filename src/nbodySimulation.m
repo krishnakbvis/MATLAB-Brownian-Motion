@@ -7,6 +7,7 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
     epsilon = e;
     N = numParticles;    
     boxwidth = bw;
+    onesMat = ones(N,N);
     
     radii = 0.15*ones(N,1);
     radii(N/2) = particleSize;
@@ -37,7 +38,7 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
     masses(N/2) = brownianMass;
     % Kick-off simulator
     sigma = radii/(2^(1/6));
-    oldAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B);
+    oldAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B, onesMat);
     %% Preallocate matrices
     numSteps = numel(0:100:length(time));
     xPositionMatrix = zeros(numSteps, size(pos, 1));
@@ -61,7 +62,7 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
         xpos = xpos + xvel * timeStep + 0.5 * oldAccelerations(:, 1) * timeStep^2;
         ypos = ypos + yvel * timeStep + 0.5 * oldAccelerations(:, 2) * timeStep^2; 
         pos = [xpos, ypos];
-        newAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B);
+        newAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B, onesMat);
     
         % Container collision physics
         inboundX = (xpos - radii <= 0) | (xpos + radii >= boxwidth);
