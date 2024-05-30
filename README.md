@@ -1,4 +1,4 @@
-![image](https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/cd36570d-114a-4ad3-94c5-443dacc38858)# Brownian Motion PHYS2020 project
+# Brownian Motion PHYS2020 project
 
 Gitlab repository for PHYS2020 Simulation project Semester 1. Authored by Krishna Karthik.
 
