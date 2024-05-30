@@ -1,14 +1,14 @@
 timeStep = 1e-4;
-runTime = 10;   
+runTime = 30;   
 epsilon = 0.15;
-N = 120;    
-boxwidth = 7;
+N = 200;    
+boxwidth = 12;
 particleSize = 1;
 A = 0.2;
 B = 1;
-initVel = 5;
+initVel = 18;
 particleMass = 1;
-brownianMass = 1e10;
+brownianMass = 4*1e10;
 
 [xPositionMatrix, yPositionMatrix, timesLength] = ...
     nbodySimulation(runTime, timeStep, epsilon, A, B, ...
