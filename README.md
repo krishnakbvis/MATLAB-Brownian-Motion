@@ -12,7 +12,8 @@ This project includes a fully vectorised implementation of a molecular dynamics 
 
 computeAcceleration is a fully vectorised function that takes in a parameter for particle x-y positions `pos`, their respective `masses`, and Lennard-Jones parameters `sigmas`, `epsilon`, `A`, and `B`. 
 
-$$\frac{x}{y}$$
+$$V_{LJ}(r) = 4\epsilon \left[\left( \frac{\sigma}{r}\right)^12 \left(\frac{\sigma}{r}\right)^6\right]
+
 
 
 
