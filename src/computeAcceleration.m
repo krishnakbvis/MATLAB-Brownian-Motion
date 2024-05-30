@@ -9,9 +9,6 @@ function [acceleration] = computeAcceleration(pos, masses, sigmas, epsilon, A, B
     x = pos(:, 1);
     y = pos(:, 2);
 
-%     x = gpuArray(x);
-%     y = gpuArray(y);
-
     % Compute pairwise particle separations
     dx = x' - x;
     dy = y' - y;
@@ -50,8 +47,6 @@ function [acceleration] = computeAcceleration(pos, masses, sigmas, epsilon, A, B
     ax = FtotX ./ masses;
     ay = FtotY ./ masses;
     
-%     gather
-
 
     % Pack together the acceleration components
     acceleration = [ax, ay];
