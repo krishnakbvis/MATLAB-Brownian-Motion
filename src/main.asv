@@ -1,10 +1,10 @@
 timeStep = 1e-4;
-runTime = 50;   
+runTime = 10;   
 epsilon = 0.3;
-N = 70;    
+N = 1;    
 boxwidth = 6;
 particleSize = 0.6;
-A = 0.3;
+A = 0;
 B = 1;
 initVel = 8;
 particleMass = 1;

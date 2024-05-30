@@ -61,7 +61,7 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
         xpos = xpos + xvel * timeStep + 0.5 * oldAccelerations(:, 1) * timeStep^2;
         ypos = ypos + yvel * timeStep + 0.5 * oldAccelerations(:, 2) * timeStep^2; 
         pos = [xpos, ypos];
-        newAcceleration = computeAcceleration(pos, masses, sigma, epsilon, A, B);
+        newAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B);
     
         % Container collision physics
         inboundX = (xpos - radii <= 0) | (xpos + radii >= boxwidth);
@@ -70,14 +70,15 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
         yvel(inboundY) = -yvel(inboundY);
         
         % Update velocities
-        xvel = xvel + 0.5 * (newAcceleration(:, 1) + oldAccelerations(:, 1)) * timeStep;
-        yvel = yvel + 0.5 * (newAcceleration(:, 2) + oldAccelerations(:, 2)) * timeStep;
+        xvel = xvel + 0.5 * (newAccelerations(:, 1) + oldAccelerations(:, 1)) * timeStep;
+        yvel = yvel + 0.5 * (newAccelerations(:, 2) + oldAccelerations(:, 2)) * timeStep;
         
         % Update arrays
         vel = [xvel, yvel];
         
-        % Update accelerations
-        oldAccelerations = computeAcceleration(pos, masses, sigma, epsilon, A, B);
+
+        %set oldAccelerations to the new value of accelerations
+        oldAccelerations = newAccelerations;
         
         % Progress simulation
         time = time + timeStep;
