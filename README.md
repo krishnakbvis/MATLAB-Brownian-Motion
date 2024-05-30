@@ -7,6 +7,10 @@ This project includes a fully vectorised implementation of a molecular dynamics 
 
 `computeAcceleration` is implemented in a fully vectorised way, avoiding the typical nested for-loops seen in naive MD simulations. `nbodysimulation` then uses computeAcceleration to compute the accelerations of the particles and numerically integrate for each timestep. It then returns the position matrices for animation. Then, when called with the correct parameters, animation.m draws the computed positions from `nbodysimulation` and animates them. 
 
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/8698cfb0-683c-4cc2-b77b-784eb27b420d" align="left" height="350" width="350">
+
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/blob/master/Brownian%20motion%20eg%202.png?raw=true" align="left" height="350" width="350">
+
 
 ### computeAcceleration.m
 
@@ -16,9 +20,9 @@ $$V_{LJ}(r) = 4\epsilon \left[\left( A\frac{\sigma}{r}\right)^{12} -  B\left(\fr
 
 We can compute forces using the Newtonian relation 
 
-$$\bold{F} = -\nabla V$$
+$$\mathbf{F} = -\nabla V$$
 
-$$\bold{F} = 4{\epsilon}\cdot\left(\dfrac{6B{\sigma}^6}{r^7}-\dfrac{12A{\sigma}^{12}}{r^{13}}\right)$$
+$$\mathbf{F} = 4{\epsilon}\cdot\left(\dfrac{6B{\sigma}^6}{r^7}-\dfrac{12A{\sigma}^{12}}{r^{13}}\right)$$
 
 To compute this interaction force between each body, consider the n-by-n matrices containing the x and y separations between each body. In computeforces, this is `dx` and `dy`. Instead of using a for-loop to iterate through each body, which is of `O(n^2)` complexity, we can simply calculate `dx = x' - x`, where `x` is an n-by-1 matrix, and `x'` is its transpose. MATLAB uses matrix broadcasting to extend `x'` and `x`, so the result will be an n-by-n matrix of separations. 
 
