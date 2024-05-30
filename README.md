@@ -1,15 +1,16 @@
-# Brownian Motion PHYS2020 project
+![image](https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/cd36570d-114a-4ad3-94c5-443dacc38858)# Brownian Motion PHYS2020 project
 
 Gitlab repository for PHYS2020 Simulation project Semester 1. Authored by Krishna Karthik.
 
 ## Description
 This project includes a fully vectorised implementation of a molecular dynamics Brownian motion simulation in MATLAB. The project contains 3 function files, computeAcceleration.m, animation.m, and nbodysimulation.m. `computeAcceleration` takes in positions, masses, and Lennard-Jones parameters as inputs, and then uses the 6-12 Lennard-Jones potential to compute the forces between particles. It then divides by respective masses to compute the accelerations of each particle in the simulation.
 
-`computeAcceleration` is implemented in a fully vectorised way, avoiding the typical nested for-loops seen in naive MD simulations. `nbodysimulation` then uses computeAcceleration to compute the accelerations of the particles and numerically integrate for each timestep. It then returns the position matrices for animation. Then, when called with the correct parameters, animation.m draws the computed positions from `nbodysimulation` and animates them. 
+`computeAcceleration` is implemented in a fully vectorised way, avoiding the typical nested for-loops seen in naive MD simulations. `nbodysimulation` then uses computeAcceleration to compute the accelerations of the particles and numerically integrate for each timestep. It then returns the position matrices for animation. Then, when called with the correct parameters, animation.m draws the computed positions from `nbodysimulation` and animates them. The following shows the fitted probability distribution of the Brownian particle:
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/3be4e15f-baf3-4c78-9ea3-c83d2ccf4f23" align="center" height="250" width="250">
 
-<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/assets/124866933/8698cfb0-683c-4cc2-b77b-784eb27b420d" align="left" height="350" width="350">
+An example of the Brownian motion path simulated:
 
-<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/blob/master/Brownian%20motion%20eg%202.png?raw=true" align="left" height="350" width="350">
+<a href="url"><img src="https://github.com/krishnakbvis/MATLAB-Brownian-Motion/blob/master/Brownian%20motion%20eg%202.png?raw=true" align="center" height="350" width="350">
 
 
 ### computeAcceleration.m
