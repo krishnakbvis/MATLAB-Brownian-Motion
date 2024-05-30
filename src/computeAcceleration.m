@@ -1,4 +1,4 @@
-function [acceleration] = getAcc(pos, masses, sigmas, epsilon, A, B)
+function [acceleration] = computeAcceleration(pos, masses, sigmas, epsilon, A, B)
     % pos is an N x 2 matrix of positions
     % masses is an N x 1 vector of inverse masses
     % sigmas is assumed to be an N x 1 vector
