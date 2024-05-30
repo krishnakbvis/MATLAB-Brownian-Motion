@@ -1,0 +1,9 @@
+function [] = createHistogram(xPositions, yPositions, binsize)
+    dx = diff(xPositions);
+    dy = diff(yPositions);
+    combinedDxDy = [dx; dy];
+    numbins = binsize;
+
+
+    h = histogram(combinedDxDy, numbins, 'Normalization','probability');     
+    histfit(h, '')
