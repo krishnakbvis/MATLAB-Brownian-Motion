@@ -1,6 +1,6 @@
 # Brownian Motion PHYS2020 project
 
-Gitlab repository for PHYS2020 Simulation project Semester 1. Authored by Krishna Karthik.
+Repository for PHYS2020 Simulation project Semester 1. Authored by Krishna Karthik.
 
 ## Description
 This project includes a fully vectorised implementation of a molecular dynamics Brownian motion simulation in MATLAB. The project contains 3 function files, computeAcceleration.m, animation.m, and nbodysimulation.m. `computeAcceleration` takes in positions, masses, and Lennard-Jones parameters as inputs, and then uses the 6-12 Lennard-Jones potential to compute the forces between particles. It then divides by respective masses to compute the accelerations of each particle in the simulation.
