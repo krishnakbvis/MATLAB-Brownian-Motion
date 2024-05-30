@@ -15,8 +15,8 @@ function [xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(rt, t
     A = Aparam;
     B = Bparam;
     % Position data of bodies
-    xPositions = (boxwidth-2)*rand(1,N)+1;
-    yPositions = (boxwidth-2)*rand(1,N)+1;
+    xPositions = (boxwidth-1)*rand(1,N)+1;
+    yPositions = (boxwidth-1)*rand(1,N)+1;
     xPositions(N/2) = boxwidth/2;
     yPositions(N/2) = boxwidth/2;
     

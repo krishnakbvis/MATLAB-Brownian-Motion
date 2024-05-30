@@ -16,7 +16,8 @@ function [] = animate(boxwidth, xPositionMatrix, yPositionMatrix, timesLength, N
         xbrownian = xPositionMatrix(i,N/2);
         ybrownian = yPositionMatrix(i,N/2);
         plot(xbrownian, ybrownian, '.', 'MarkerSize', 180); 
-        plot(xPositionMatrix(1:i,N/2), yPositionMatrix(1:i,N/2), 'MarkerSize', 3);
+        plot([old(1) xbrownian], [old(2) ybrownian]);
+        old = []
         hold on
         plot(xPositionMatrix(i,N/2 + 1:N), yPositionMatrix(i,N/2 + 1:N), '.', 'MarkerSize',30); 
         hold off
