@@ -1,19 +1,19 @@
-N = 30;
 timeStep = 1e-4;
-runTime = 30;   
-loopingTime = runTime/timeStep; 
-timesLength = loopingTime/100;
-epsilon = 0.1;
-N = 30;    
-boxwidth = 12;
-particleSize = 0.15;
-brownianSize = 0.7;
-A = 3;
+runTime = 10;   
+epsilon = 0.3;
+N = 1;    
+boxwidth = 6;
+particleSize = 0.6;
+A = 0;
 B = 1;
 initVel = 8;
-particleMass = 
+particleMass = 1;
+brownianMass = 1e7;
 
-[xPositionMatrix, yPositionMatrix, timesLength] = nbodySimulation(runTime, timeStep, epsilon, A, B, particleMas);
+[xPositionMatrix, yPositionMatrix, timesLength] = ...
+    nbodySimulation(runTime, timeStep, epsilon, A, B, ...
+    particleMass, brownianMass, N, boxwidth, initVel, particleSize);
+
 animate(boxwidth, xPositionMatrix, yPositionMatrix, timesLength, N);
 
 
