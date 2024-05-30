@@ -47,9 +47,4 @@ To render fast animations, the 2D MATLAB `plot` function is used. The particle u
 
 
 ## Project status
-80% complete. Existing tasks:
-
-- Track Brownian motion
-- Increase particle size to 250
-- decrease timestep by a factor of 10
 - create a histogram from the brownian particle's position dataset 
