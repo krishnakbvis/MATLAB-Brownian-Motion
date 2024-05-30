@@ -13,7 +13,7 @@ function [] = animate(boxwidth, xPositionMatrix, yPositionMatrix, timesLength, N
         %use rectangle() to draw a filled circle
         plot(xPositionMatrix(i,1:N/2-1), yPositionMatrix(i,1:N/2-1), '.', 'MarkerSize',30); 
         hold on
-        plot(xPositionMatrix(i,N/2), yPositionMatrix(i,N/2), '.', 'MarkerSize', 90); 
+        plot(xPositionMatrix(i,N/2), yPositionMatrix(i,N/2), '.', 'MarkerSize', 180); 
         hold on
         plot(xPositionMatrix(i,N/2 + 1:N), yPositionMatrix(i,N/2 + 1:N), '.', 'MarkerSize',30); 
         hold off
