@@ -1,27 +1,29 @@
-function [] = createHistogram(xPositions, yPositions, binsize)
+function [binCenters, binCounts] = createHistogram(xPositions, yPositions, binsize, N, A, B)
     dx = diff(xPositions);
     dy = diff(yPositions);
     combinedDxDy = [dx; dy];
     numbins = binsize;
-
-
-    gaussian = @(x, m,s) exp(-0.5*((x-m)/s).^2)/(s*sqrt(2*pi));
-    mu = mean(combinedDxDy);                             % Arbitrary mean
-    sigma = std(combinedDxDy);                          % arbitrary standard deviation
-    h = histogram(combinedDxDy, numbins, 'Normalization', 'probability');     
-    dh = h.BinWidth;
-    lo = min(combinedDxDy);
-    hi = max(combinedDxDy);
-    dxx = (hi-lo)/100;
-    xx = linspace(lo,hi,101);
-    pdf = gaussian(xx, mu, sigma);
-    scalefactor = sum(h.Values*dh)/(trapz(pdf)*dxx);
-    pdf = scalefactor*pdf;
+    histogram(combinedDxDy, numbins, 'Normalization', 'probability');     
+    stdev = std(combinedDxDy);
+    mu = mean(combinedDxDy);
     hold on
-    plot(xx,pdf)
+    [binCounts, edges] = histcounts(combinedDxDy, numbins, 'Normalization','probability');     
     
-    title("mean = " + num2str(mu) + ", std = " + num2str(sigma));
+    binCenters = zeros(1, length(edges)-1);
 
+    for i = 1:length(edges)-1 
+        binCenters(i) = 0.5*(edges(i) + edges(i+1));
+    end
+    hold on
+    gaussEqn = 'a*exp(-((x-b)/c)^2)+d';
+    startPoints = [0.01, 0.01, 0.01, 0.01];
+    [f1,gof] = fit(binCenters',binCounts',gaussEqn,'Start', startPoints);
+    plot(f1, binCenters, binCounts);
+    title("no. particles = " + num2str(N) + ", A = " + num2str(A) + ", B = " + num2str(B) + ", \sigma = " + num2str(stdev) + ", \mu = " + num2str(mu) + ", R^2 = " + num2str(gof.rsquare));
+    xlabel("displacement");
+    ylabel("P(x)");
+    hold off
+    
 end
 
     
