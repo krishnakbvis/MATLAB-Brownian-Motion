@@ -52,4 +52,4 @@ To render fast animations, the 2D MATLAB `plot` function is used. The particle u
 
 
 ## Project status
-- create a histogram from the brownian particle's position dataset 
+- Complete
